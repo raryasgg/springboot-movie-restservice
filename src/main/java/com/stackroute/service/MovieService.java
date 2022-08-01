@@ -3,9 +3,9 @@ package com.stackroute.service;
 import com.stackroute.exceptions.MovieAlreadyExistException;
 import com.stackroute.exceptions.MovieNotFoundException;
 import com.stackroute.model.Movie;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 
 public interface MovieService {
 

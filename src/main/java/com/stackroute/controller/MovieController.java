@@ -13,15 +13,20 @@ import java.util.List;
 
 
 /* Annotate the class with @RestController and @RequestMapping */
-@RequestMapping(value = "/api/v1")
+@RestController
 public class MovieController {
-
-    MovieService movieService;
+@Autowired
+   private MovieService movieService;
 
 
     /*
      * Constructor based Autowiring should be implemented
      */
+	@Autowired
+	public MovieController(MovieService movieService) {
+		super();
+		this.movieService = movieService;
+	}
 
 
     /*
@@ -29,10 +34,9 @@ public class MovieController {
      * the URL "/movies". This method will return the List of movies in the response body
      *  with the Httpstatus OK.
      */
-    @GetMapping(value = "/movies")
-    public ResponseEntity<?> getAllHandler() {
-
-
+    @GetMapping("/api/v1/movies")
+    public ResponseEntity<List<Movie>> getAllHandler(){
+        return new ResponseEntity<List<Movie>>(movieService.getAll(), HttpStatus.OK);
     }
 
 
@@ -42,11 +46,16 @@ public class MovieController {
      *  with the Httpstatus CREATED, if the movie is saved successfully, else, returns the message
      * "Movie already Exist" with the status CONFLICT.
      */
-    @PostMapping(value = "/movies")
-    public ResponseEntity<?> addNewHandler(@RequestBody Movie newMovie){
-
-
+    @PostMapping("api/v1/movies")
+    public ResponseEntity<Movie> addNewHandler(@RequestBody Movie movie) {
+		try {
+			return new ResponseEntity<Movie>(movieService.addNew(movie), HttpStatus.CREATED);
+		} catch (MovieAlreadyExistException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity("Movie already Exist", HttpStatus.CONFLICT);
+		}
     }
+
 
 
 
@@ -56,8 +65,13 @@ public class MovieController {
      *  with the Httpstatus OK, if the movie is found, else, returns the message
      * "Movie Not found" with the status NOT_FOUND.
      */
-    @GetMapping(value = "/movies/{id}")
-    public ResponseEntity<?> getByIdHandler(@PathVariable int id){
-
+    @GetMapping("api/v1/movies/{id}")
+    public ResponseEntity<Movie> getByIdHandler(@PathVariable int id) {
+    	try {
+			return new ResponseEntity<Movie>(movieService.getById(id), HttpStatus.OK);
+		} catch (MovieNotFoundException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity("Movie Not found", HttpStatus.NOT_FOUND);
+		}
     }
 }
